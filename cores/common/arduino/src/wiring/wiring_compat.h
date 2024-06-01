@@ -34,9 +34,9 @@ extern "C" {
 #define CONFIG_LWIP_MAX_ACTIVE_TCP 16
 
 #ifdef __cplusplus
-String ipToString(const IPAddress &ip);
+} // extern "C"
 #endif
 
 #ifdef __cplusplus
-} // extern "C"
+String ipToString(const IPAddress &ip);
 #endif

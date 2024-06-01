@@ -130,3 +130,7 @@
 #ifndef LT_DEBUG_LWIP_ASSERT
 #define LT_DEBUG_LWIP_ASSERT 0
 #endif
+
+#ifndef LT_DEBUG_LFS
+#define LT_DEBUG_LFS LT_DEBUG_ALL
+#endif

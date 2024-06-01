@@ -21,6 +21,13 @@ extern "C" {
 
 } // extern "C"
 
+// from wiring_compat.cpp
+String ipToString(const IPAddress &ip) {
+	char szRet[16];
+	sprintf(szRet, "%hhu.%hhu.%hhu.%hhu", ip[0], ip[1], ip[2], ip[3]);
+	return String(szRet);
+}
+
 #define _clientKeyC ((mbedtls_pk_context *)_clientKey)
 
 MbedTLSClient::MbedTLSClient() : WiFiClient() {
