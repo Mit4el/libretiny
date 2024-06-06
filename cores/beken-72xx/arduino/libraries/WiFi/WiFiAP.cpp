@@ -51,7 +51,7 @@ bool WiFiClass::softAP(const char *ssid, const char *passphrase, int channel, bo
 
 bool WiFiClass::softAPConfig(IPAddress localIP, IPAddress gateway, IPAddress subnet) {
 	if (!localIP) {
-		localIP = gateway = IPAddress(192, 168, 43, 1);
+		localIP = gateway = IPAddress(192, 168, 4, 1);
 		subnet			  = IPAddress(255, 255, 255, 0);
 	}
 	sprintf(AP_CFG.local_ip_addr, IP_FMT, localIP[0], localIP[1], localIP[2], localIP[3]);
