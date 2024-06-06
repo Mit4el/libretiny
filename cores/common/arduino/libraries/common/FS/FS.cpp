@@ -118,7 +118,7 @@ void File::close() {
 }
 
 File::operator bool() const {
-	return _p != nullptr && *_p != false;//!!_p;
+	return _p != nullptr && !!_p;
 }
 
 bool File::truncate(uint32_t size) {
