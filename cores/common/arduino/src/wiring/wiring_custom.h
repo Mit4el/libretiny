@@ -67,7 +67,7 @@ uint32_t pinIndex(PinInfo *pin);
 bool pinSupported(PinInfo *pin, uint32_t mask);
 bool pinEnabled(PinInfo *pin, uint32_t mask);
 void pinRemoveMode(PinInfo *pin, uint32_t mask);
-
+unsigned long pulseIn(uint8_t pinNumber, uint8_t state, unsigned long timeout);
 /**
  * @brief Deinitialize the pin, by removing all enabled modes.
  */

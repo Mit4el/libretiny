@@ -118,3 +118,60 @@ void pinRemoveMode(PinInfo *pin, uint32_t mask) {
 		pinDisable(pin, PIN_PWM);
 	}
 }
+
+/* Measures the length (in microseconds) of a pulse on the pin; state is HIGH
+ * or LOW, the type of pulse to measure.  Works on pulses from 2-3 microseconds
+ * to 3 minutes in length, but must be called at least a few dozen microseconds
+ * before the start of the pulse. */
+unsigned long pulseIn(uint8_t pinNumber, uint8_t state, unsigned long timeout) {
+	// cache the port and bit of the pin in order to speed up the
+	// pulse width measuring loop and achieve finer resolution.  calling
+	// digitalRead() instead yields much coarser resolution.
+	PinInfo *pin = pinInfo(pinNumber);
+	if (pin == NULL)
+		return 0;
+	uint32_t index = pinIndex(pin);
+
+	uint32_t start_ticks, cur_ticks;
+
+	if (pin->gpio == NULL)
+		return 0;
+
+	/* Handle */
+	if (!pinEnabled(pin, PIN_GPIO)) {
+		return 0;
+	}
+	//PinData *data	= pinData(pin);
+	//gpio_t *pGpio_t = data->gpio;
+
+	// wait for any previous pulse to end
+	start_ticks = micros();
+	while (digitalRead(pinNumber) == state) {
+		cur_ticks = micros();
+		if (cur_ticks - start_ticks > timeout)
+			return 0;
+	}
+
+	// wait for the pulse to start
+	while (digitalRead(pinNumber) != state) {
+		cur_ticks = micros();
+		if (cur_ticks - start_ticks > timeout)
+			return 0;
+	}
+
+	// wait for the pulse to stop
+	start_ticks = micros();
+	while (digitalRead(pinNumber) == state) {
+		cur_ticks = micros();
+		if (cur_ticks - start_ticks > timeout)
+			return 0;
+	}
+
+	cur_ticks = micros();
+
+	// convert the reading to microseconds. The loop has been determined
+	// to be 52 clock cycles long and have about 16 clocks between the edge
+	// and the start of the loop. There will be some error introduced by
+	// the interrupt handlers.
+	return cur_ticks - start_ticks;
+}
