@@ -24,7 +24,7 @@
 #include <../include/time.h> // See issue #6714
 #include <Arduino.h>
 #include <memory>
-
+#include "littlefs/lfs.h"
 class SDClass;
 
 namespace fs {
@@ -219,7 +219,7 @@ class FS {
 	}
 
 	bool setConfig(const FSConfig &cfg);
-
+	lfs_t *getFS();
 	bool begin();
 	void end();
 

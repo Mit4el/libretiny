@@ -166,8 +166,10 @@ void File::rewindDirectory() {
 
 File File::openNextFile() {
 	if (!_fakeDir) {
+		LT_IM(LFS,"!_fakeDir, fullName() = %s\r\n", fullName());
 		_fakeDir = std::make_shared<Dir>(_baseFS->openDir(fullName()));
 	}
+	LT_IM(LFS,"openNextFile");
 	_fakeDir->next();
 	return _fakeDir->openFile("r");
 }
@@ -295,6 +297,13 @@ bool FS::setConfig(const FSConfig &cfg) {
 	return _impl->setConfig(cfg);
 }
 
+lfs_t *fs::FS::getFS() {
+		lfs_t * lfs = nullptr;
+		if (_impl)
+			lfs = _impl->getFS();
+		return lfs;
+}
+
 bool FS::begin() {
 	if (!_impl) {
 		LT_IM(LFS,"#error: FS: no implementation");
@@ -382,7 +391,11 @@ Dir FS::openDir(const char *path) {
 	if (!_impl) {
 		return Dir();
 	}
+	LT_IM(LFS,"PRE openDir = %s\r\n", path);
 	DirImplPtr p = _impl->openDir(path);
+	delay(20);
+	LT_IM(LFS,"POST openDir = %s\r\n", path);
+		delay(100);
 	Dir d(p, this);
 	d.setTimeCallback(_timeCallback);
 	return d;

@@ -7,6 +7,7 @@
  */
 #include "lfs.h"
 #include "lfs_util.h"
+#include <Arduino.h>
 
 // some constants used throughout the code
 #define LFS_BLOCK_NULL	 ((lfs_block_t)-1)
@@ -486,8 +487,11 @@ static inline void lfs_superblock_tole32(lfs_superblock_t *superblock) {
 
 #ifndef LFS_NO_ASSERT
 static bool lfs_mlist_isopen(struct lfs_mlist *head, struct lfs_mlist *node) {
+
 	for (struct lfs_mlist **p = &head; *p; p = &(*p)->next) {
+
 		if (*p == (struct lfs_mlist *)node) {
+			//LT_IM(LFS,"lfs_mlist_isopen TRUE -> type: %d, id: %d",  &(*p)->type,  &(*p)->id);
 			return true;
 		}
 	}
@@ -2684,6 +2688,7 @@ static int lfs_rawmkdir(lfs_t *lfs, const char *path) {
 
 static int lfs_dir_rawopen(lfs_t *lfs, lfs_dir_t *dir, const char *path) {
 	lfs_stag_t tag = lfs_dir_find(lfs, &dir->m, &path, NULL);
+		LT_IM(LFS,"lfs_dir_find -> type: %d, id: %04X end", lfs_tag_type3(tag), lfs_tag_id(tag));
 	if (tag < 0) {
 		return tag;
 	}
@@ -2694,6 +2699,8 @@ static int lfs_dir_rawopen(lfs_t *lfs, lfs_dir_t *dir, const char *path) {
 
 	lfs_block_t pair[2];
 	if (lfs_tag_id(tag) == 0x3ff) {
+		LT_IM(LFS,"lfs_dir_rawopen ROOT 0x3FF");
+		LT_IM(LFS,"lfs_dir_rawopen ROOT[0]=%04X, ROOT[1]=%04X", lfs->root[0], lfs->root[1]);
 		// handle root dir separately
 		pair[0] = lfs->root[0];
 		pair[1] = lfs->root[1];
@@ -2710,9 +2717,10 @@ static int lfs_dir_rawopen(lfs_t *lfs, lfs_dir_t *dir, const char *path) {
 	// fetch first pair
 	int err = lfs_dir_fetch(lfs, &dir->m, pair);
 	if (err) {
+		LT_IM(LFS,"lfs_dir_rawopen Return, err = %d", err);
 		return err;
 	}
-
+	LT_IM(LFS,"lfs_dir_rawopen err = %d", err);
 	// setup entry
 	dir->head[0] = dir->m.pair[0];
 	dir->head[1] = dir->m.pair[1];
@@ -2721,8 +2729,11 @@ static int lfs_dir_rawopen(lfs_t *lfs, lfs_dir_t *dir, const char *path) {
 
 	// add to list of mdirs
 	dir->type = LFS_TYPE_DIR;
+	LT_IM(LFS,"lfs_dir_rawopen Append list head[0]=%04X, head[1]=%04X", dir->head[0], dir->head[1]);
+	LT_IM(LFS,"lfs_dir_rawopen Append list");
 	lfs_mlist_append(lfs, (struct lfs_mlist *)dir);
-
+	LT_IM(LFS,"lfs_dir_rawopen Append list END");
+	delay(10);
 	return 0;
 }
 
@@ -6234,16 +6245,21 @@ int lfs_mkdir(lfs_t *lfs, const char *path) {
 
 int lfs_dir_open(lfs_t *lfs, lfs_dir_t *dir, const char *path) {
 	int err = LFS_LOCK(lfs->cfg);
+	//vPortEnterCritical();
 	if (err) {
 		return err;
 	}
+	LT_IM(LFS,"lfs_dir_open(%p, %p, \"%s\")\n", (void *)lfs, (void *)dir, path);
 	LFS_TRACE("lfs_dir_open(%p, %p, \"%s\")", (void *)lfs, (void *)dir, path);
 	LFS_ASSERT(!lfs_mlist_isopen(lfs->mlist, (struct lfs_mlist *)dir));
 
 	err = lfs_dir_rawopen(lfs, dir, path);
-
+	delay(20);
+	LT_IM(LFS,"lfs_dir_open -> %04X", err);
 	LFS_TRACE("lfs_dir_open -> %d", err);
 	LFS_UNLOCK(lfs->cfg);
+	delay(20);
+	//vPortExitCritical();
 	return err;
 }
 

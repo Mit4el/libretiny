@@ -146,7 +146,9 @@ class FSImpl {
 	virtual void setTimeCallback(time_t (*cb)(void)) {
 		_timeCallback = cb;
 	}
-
+	lfs_t *getFS() {
+		return nullptr;
+	}
   protected:
 	time_t (*_timeCallback)(void) = nullptr;
 };

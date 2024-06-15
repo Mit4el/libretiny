@@ -92,7 +92,7 @@ def env_add_arduino_libraries(env: Environment, queue, name: str, path: str) -> 
         includes=(
             [
                 "!<*/.>",
-                "!<*/*>",
+                "!<**/*>",
             ]
             if name.startswith("common")
             else [

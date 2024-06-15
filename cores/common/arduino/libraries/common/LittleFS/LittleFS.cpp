@@ -107,9 +107,11 @@ DirImplPtr LittleFSImpl::openDir(const char *path) {
 	}
 	char *pathStr = strdup(path); // Allow edits on our scratch copy
 	// Get rid of any trailing slashes
+	LT_IM(LFS,"openDir() === openDir(/) ::openDir: path=`%s`\n", pathStr);
 	while (strlen(pathStr) && (pathStr[strlen(pathStr) - 1] == '/')) {
 		pathStr[strlen(pathStr) - 1] = 0;
 	}
+	LT_IM(LFS,"openDir() === openDir(/) ::openDir: path=`%s`\n", pathStr);
 	// At this point we have a name of "blah/blah/blah" or "blah" or ""
 	// If that references a directory, just open it and we're done.
 	lfs_info info;
@@ -118,10 +120,15 @@ DirImplPtr LittleFSImpl::openDir(const char *path) {
 	const char *filter = "";
 	if (!pathStr[0]) {
 		// openDir("") === openDir("/")
+		LT_IM(LFS,"openDir() === openDir(/) ::openDir: path=`%s`\n", pathStr);
 		rc	   = lfs_dir_open(&_lfs, dir.get(), "/");
+		delay(20);
+		LT_IM(LFS,"LittleFSImpl::openDir: path=`%s` err=%d\n", path, rc);
+		delay(20);
 		filter = "";
 	} else if (lfs_stat(&_lfs, pathStr, &info) >= 0) {
 		if (info.type == LFS_TYPE_DIR) {
+
 			// Easy peasy, path specifies an existing dir!
 			rc	   = lfs_dir_open(&_lfs, dir.get(), pathStr);
 			filter = "";
@@ -160,12 +167,17 @@ DirImplPtr LittleFSImpl::openDir(const char *path) {
 		return DirImplPtr();
 	}
 	// Skip the . and .. entries
+	LT_IM(LFS,"LittleFSImpl::openDir: path=`%s` err=%d\n", path, rc); delay(20);
 	lfs_info dirent;
 	lfs_dir_read(&_lfs, dir.get(), &dirent);
 	lfs_dir_read(&_lfs, dir.get(), &dirent);
 
 	auto ret = std::make_shared<LittleFSDirImpl>(filter, this, dir, pathStr);
+	delay(20);
+
 	free(pathStr);
+		LT_IM(LFS,"LittleFSImpl::openDir: pathStr=`%s` RET=%d\n", pathStr, ret); delay(20);
+	delay(20);
 	return ret;
 }
 

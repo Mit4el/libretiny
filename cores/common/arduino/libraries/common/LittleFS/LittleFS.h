@@ -261,14 +261,14 @@ class LittleFSImpl : public FSImpl {
 			return 0;
 		}
 	}
-
+	lfs_t *getFS() {
+		return &_lfs;
+	}
   protected:
 	friend class LittleFSFileImpl;
 	friend class LittleFSDirImpl;
 
-	lfs_t *getFS() {
-		return &_lfs;
-	}
+
 
 	bool _tryMount() {
 		if (_mounted) {
@@ -600,6 +600,7 @@ class LittleFSDirImpl : public DirImpl {
 			_dirPath.get() && _dirPath.get()[0] ? "/" : "",
 			_dirent.name
 		);
+		LT_IM(LFS,"openFile:'%s\n'",(const char *)tmpName);
 		auto ret = _fs->open((const char *)tmpName, openMode, accessMode);
 		return ret;
 	}
