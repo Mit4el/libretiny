@@ -30,7 +30,7 @@
 #include <FSImpl.h>
 #include <limits>
 
-#define LFS_NAME_MAX 32
+//#define LFS_NAME_MAX 32
 #include "Flash.h"
 #include "littlefs/lfs.h"
 
